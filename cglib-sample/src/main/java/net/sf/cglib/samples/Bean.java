@@ -9,7 +9,7 @@ public abstract class Bean implements java.io.Serializable{
    
     String sampleProperty;
     
-  abstract public void addPropertyChangeListener(PropertyChangeListener listener); 
+  abstract public void addPropertyChangeListener(PropertyChangeListener listener);
    
   abstract public void removePropertyChangeListener(PropertyChangeListener listener);
    

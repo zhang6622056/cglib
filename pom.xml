@@ -76,6 +76,7 @@
         <module>cglib-sample</module>
         <module>cglib-integration-test</module>
         <module>cglib-jmh</module>
+        <module>asm</module>
     </modules>
 
     <!-- ====================================================================== -->
