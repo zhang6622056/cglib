@@ -1,6 +1,7 @@
 package write;
 
 
+import example.AsmClassLoader;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
@@ -25,16 +26,17 @@ public class ClassGenerater {
     public static void main(String[] args) throws ClassNotFoundException {
         //生成二进制字节码
         ClassGenerater classGenerater = new ClassGenerater();
-        classGenerater.generateByteClass();
+        byte[] datas = classGenerater.generateByteClass();
 
 
-        //TODO-ZL loadclass
-        ClassLoader classLoader = new ClassLoader() {
-            @Override
-            protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-                return super.loadClass(name, resolve);
-            }
-        };
+        AsmClassLoader asmClassLoader = new AsmClassLoader();
+        asmClassLoader.loadClass("");
+
+
+
+
+
+
 
 
 
@@ -46,7 +48,7 @@ public class ClassGenerater {
     /****
      * 使用ASM动态生成字节码文件
      */
-    private void generateByteClass(){
+    private byte[] generateByteClass(){
         ClassWriter classWriter = new ClassWriter(0);
         classWriter.visit(Opcodes.V1_8,Opcodes.ACC_PUBLIC,"focus/nero/UserBean",null,"java/lang/Object",null);
         //设置一个字段
@@ -57,6 +59,7 @@ public class ClassGenerater {
         methodVisitor.visitCode();
         methodVisitor.visitEnd();
         byte[] data = classWriter.toByteArray();
+        return data;
     }
 
 
@@ -76,21 +79,5 @@ public class ClassGenerater {
             e.printStackTrace();
         }
     }
-
-
-
-
-    class pathClassLoader extends ClassLoader{
-
-        public pathClassLoader() {
-
-        }
-    }
-
-
-
-
-
-
 
 }

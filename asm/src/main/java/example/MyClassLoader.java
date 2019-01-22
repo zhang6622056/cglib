@@ -16,56 +16,6 @@ public class MyClassLoader extends ClassLoader {
         results = loadClassFile(pathName);
     }
 
-    public static void main(String[] args) {
-        //初始化我们的classloader，同时拿到class所转成的字节码文件
-        MyClassLoader classLoader = new MyClassLoader("F:\\Test.class");
-        try {
-            //这里要把包路径传入进去
-            Class<?> clazz = classLoader.loadClass("com.ljx.yyy.Test");
-            Object o = clazz.newInstance();
-
-            //通过反射机制调用我们的Test.java中的printToString方法
-            Method method = clazz.getMethod("printToString");
-            method.invoke(clazz.newInstance());
-            System.out.println(o.getClass().getClassLoader().toString());
-
-            Method[] methods = clazz.getMethods();
-            for (int i = 0; i < methods.length; i++) {
-                //获取类中的方法名字
-                String methodName = methods[i].getName();
-                System.out.println("MethodName : " + methodName);
-                Class<?>[] params = methods[i].getParameterTypes();
-                for (int j = 0; j < params.length; j++) {
-                    //获取方法中的参数类型
-                    System.out.println("ParamsType : " + params[j].toString());
-                }
-            }
-
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-    }
-
     //把我们的class文件转成字节码，用于classloader动态加载
     private byte[] loadClassFile(String classPath) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -79,10 +29,8 @@ public class MyClassLoader extends ClassLoader {
             }
 
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -118,4 +66,62 @@ public class MyClassLoader extends ClassLoader {
 
         return clazz;
     }
+
+
+
+
+
+
+
+
+    public static void main(String[] args) {
+        //初始化我们的classloader，同时拿到class所转成的字节码文件
+        MyClassLoader classLoader = new MyClassLoader("F:\\Test.class");
+        try {
+            //这里要把包路径传入进去
+            Class<?> clazz = classLoader.loadClass("com.ljx.yyy.Test");
+            Object o = clazz.newInstance();
+
+            //通过反射机制调用我们的Test.java中的printToString方法
+            Method method = clazz.getMethod("printToString");
+            method.invoke(clazz.newInstance());
+            System.out.println(o.getClass().getClassLoader().toString());
+
+            Method[] methods = clazz.getMethods();
+            for (int i = 0; i < methods.length; i++) {
+                //获取类中的方法名字
+                String methodName = methods[i].getName();
+                System.out.println("MethodName : " + methodName);
+                Class<?>[] params = methods[i].getParameterTypes();
+                for (int j = 0; j < params.length; j++) {
+                    //获取方法中的参数类型
+                    System.out.println("ParamsType : " + params[j].toString());
+                }
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
+
+
+
 }
