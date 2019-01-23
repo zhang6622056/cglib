@@ -1,4 +1,4 @@
-package example;
+package loaders;
 
 /**
  * asm字节码加载器
@@ -18,9 +18,4 @@ public class AsmClassLoader extends ClassLoader{
         Class clazz = defineClass(name,bytes,0,bytes.length,null);
         return clazz;
     }
-
-
-
-
-
 }
