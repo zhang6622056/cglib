@@ -6,10 +6,7 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 /**
  *
@@ -23,25 +20,15 @@ public class ClassGenerater {
 
 
 
-    public static void main(String[] args) throws ClassNotFoundException {
+    public static void main(String[] args) throws ClassNotFoundException, IOException {
         //生成二进制字节码
         ClassGenerater classGenerater = new ClassGenerater();
-        byte[] datas = classGenerater.generateByteClass();
+        //byte[] datas = classGenerater.generateByteClass();
+        byte[] datas = classGenerater.getClassData("C://Users/admin/Desktop/QueryRateRequest.class");
 
-
-        AsmClassLoader asmClassLoader = new AsmClassLoader();
-        asmClassLoader.loadClass("");
-
-
-
-
-
-
-
-
-
-
-
+        AsmClassLoader asmClassLoader = new AsmClassLoader(datas);
+        Class clazz = asmClassLoader.loadClass("com.secoo.overseas.easyship.entity.QueryRateRequest");
+        System.out.println(clazz.getName());
     }
 
 
@@ -59,6 +46,7 @@ public class ClassGenerater {
         methodVisitor.visitCode();
         methodVisitor.visitEnd();
         byte[] data = classWriter.toByteArray();
+        outputFile(data);
         return data;
     }
 
@@ -79,5 +67,50 @@ public class ClassGenerater {
             e.printStackTrace();
         }
     }
+
+
+    /****
+     * 获取文件byte数组
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    private byte[] getFileBytes(String path) throws IOException {
+        FileInputStream fileIn = new FileInputStream(path);
+        byte[] bb = new byte[2048];
+        fileIn.read(bb);
+        fileIn.close();
+        return bb;
+    }
+
+
+
+
+
+
+    private byte[] getClassData(String path) {
+        try {
+            InputStream ins = new FileInputStream(path);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int bufferSize = 4096;
+            byte[] buffer = new byte[bufferSize];
+            int bytesNumRead = 0;
+            while ((bytesNumRead = ins.read(buffer)) != -1) {
+                baos.write(buffer, 0, bytesNumRead);
+            }
+            return baos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+
+
+
+
+
 
 }
