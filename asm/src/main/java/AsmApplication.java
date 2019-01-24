@@ -1,24 +1,24 @@
-import loaders.AsmClassLoader;
-import util.BytesUtil;
+import asms.read.ClassPrinter;
+import org.objectweb.asm.ClassReader;
+
+import java.io.IOException;
 
 public class AsmApplication {
 
 
-
-
-
-
-    public static void main(String[] args) throws ClassNotFoundException {
-        String classFileName = "";
-        byte[] bytes = BytesUtil.getClassBytes(classFileName);
-
-
-        AsmClassLoader asmClassLoader = new AsmClassLoader(bytes);
-        String classPackagePath = "";
-        Class clazz = asmClassLoader.loadClass(classPackagePath);
-
-        System.out.println(clazz.getName());
+    public static void main(String[] args) throws IOException {
+        ClassReader classReader = new ClassReader("simple.BasicBean");
+        ClassPrinter classPrinter = new ClassPrinter(458752);
+        classReader.accept(classPrinter,458752);
     }
+
+
+
+
+
+
+
+
 
 
 

@@ -93,6 +93,7 @@ implements ClassGenerator
             Function<AbstractClassGenerator, Object> load =
                     new Function<AbstractClassGenerator, Object>() {
                         public Object apply(AbstractClassGenerator gen) {
+                            //创建的核心
                             Class klass = gen.generate(ClassLoaderData.this);
                             return gen.wrapCachedClass(klass);
                         }

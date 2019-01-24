@@ -33,9 +33,6 @@ public class ClassGenerater {
 
 
 
-
-
-
     /****
      * 导出file
      * @param data

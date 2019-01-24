@@ -468,7 +468,10 @@ public class Enhancer extends AbstractClassGenerator
     }
 
     private Object createHelper() {
+        //-验证Interceptor的callbacktype，初始化callbacktype，
         preValidate();
+
+        //-初始化一个key
         Object key = KEY_FACTORY.newInstance((superclass != null) ? superclass.getName() : null,
                 ReflectUtils.getNames(interfaces),
                 filter == ALL_ZERO ? null : new WeakCacheKey<CallbackFilter>(filter),
@@ -574,6 +577,8 @@ public class Enhancer extends AbstractClassGenerator
         final Set forcePublic = new HashSet();
         getMethods(sc, interfaces, actualMethods, interfaceMethods, forcePublic);
 
+
+        //--转换MethodInfo list
         List methods = CollectionUtils.transform(actualMethods, new Transformer() {
             public Object transform(Object value) {
                 Method method = (Method)value;
@@ -589,6 +594,7 @@ public class Enhancer extends AbstractClassGenerator
             }
         });
 
+        //-类发射器
         ClassEmitter e = new ClassEmitter(v);
         if (currentData == null) {
         e.begin_class(Constants.V1_2,
