@@ -18,6 +18,7 @@ package net.sf.cglib.core;
 import net.sf.cglib.core.internal.Function;
 import net.sf.cglib.core.internal.LoadingCache;
 import org.objectweb.asm.ClassReader;
+import util.BytesUtil;
 
 import java.lang.ref.WeakReference;
 import java.security.ProtectionDomain;
@@ -93,7 +94,6 @@ implements ClassGenerator
             Function<AbstractClassGenerator, Object> load =
                     new Function<AbstractClassGenerator, Object>() {
                         public Object apply(AbstractClassGenerator gen) {
-                            //创建的核心
                             Class klass = gen.generate(ClassLoaderData.this);
                             return gen.wrapCachedClass(klass);
                         }
@@ -306,6 +306,12 @@ implements ClassGenerator
         }
     }
 
+
+    /*****
+     * 生成代理类的code function
+     * @param data
+     * @return
+     */
     protected Class generate(ClassLoaderData data) {
         Class gen;
         Object save = CURRENT.get();
@@ -332,6 +338,14 @@ implements ClassGenerator
             }
             byte[] b = strategy.generate(this);
             String className = ClassNameReader.getClassName(new ClassReader(b));
+
+            //转化成为javaclass文件
+            final String path = "/Users/nero/cglibclassfile/"+className+".class";
+            BytesUtil.outputJavaClassFile(path,b);
+
+
+
+
             ProtectionDomain protectionDomain = getProtectionDomain();
             synchronized (classLoader) { // just in case
                 if (protectionDomain == null) {

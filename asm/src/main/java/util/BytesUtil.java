@@ -31,6 +31,22 @@ public class BytesUtil {
     }
 
 
+    /****
+     * 输出Java class文件
+     * @param path
+     */
+    public static void outputJavaClassFile(String path,byte[] bytes) throws IOException {
+        if (null == path) return;
+        FileOutputStream fileOutputStream = new FileOutputStream(path);
+        fileOutputStream.write(bytes);
+        fileOutputStream.flush();
+        fileOutputStream.close();
+    }
+
+
+
+
+
 
 
 }

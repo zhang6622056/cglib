@@ -62,6 +62,9 @@ import org.objectweb.asm.Label;
  */
 public class Enhancer extends AbstractClassGenerator
 {
+
+
+
     private static final CallbackFilter ALL_ZERO = new CallbackFilter(){
         public int accept(Method method) {
             return 0;
@@ -561,6 +564,14 @@ public class Enhancer extends AbstractClassGenerator
         CollectionUtils.filter(methods, new RejectModifierPredicate(Constants.ACC_FINAL));
     }
 
+
+    /*****
+     *
+     *
+     * 生成代理类的核心方法
+     * @param v
+     * @throws Exception
+     */
     public void generateClass(ClassVisitor v) throws Exception {
         Class sc = (superclass == null) ? Object.class : superclass;
 

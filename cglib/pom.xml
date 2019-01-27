@@ -70,6 +70,15 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>asm</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+
+
     </dependencies>
 
 </project>

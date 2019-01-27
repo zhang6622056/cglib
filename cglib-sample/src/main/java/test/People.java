@@ -5,6 +5,7 @@ package test;
  */
 public class People {
 
+    private boolean isLazy = false;
 
 
 
@@ -15,12 +16,12 @@ public class People {
     }
 
 
+    public boolean isLazy() {
+        System.out.println("getlazy.....");
+        return isLazy;
+    }
 
-
-
-
-
-
-
-
+    public void setLazy(boolean lazy) {
+        isLazy = lazy;
+    }
 }
