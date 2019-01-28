@@ -22,6 +22,7 @@ public class test{
         enhancer.setSuperclass(people.getClass());      //设置被代理类
         enhancer.setCallbacks(initCallBacks());
         enhancer.setCallbackFilter(initCallbackFilter());
+        enhancer.setUseCache(false);
         People people1 = (People) enhancer.create();
         System.out.println(people.toString());
         System.out.println(people1.isLazy());

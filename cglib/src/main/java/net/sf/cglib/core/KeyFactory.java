@@ -170,14 +170,19 @@ abstract public class KeyFactory {
                 gen.addCustomizer(keyFactoryCustomizer);
             }
         }
+
+        //设置父类AbstractClassGenerator的classloader为interface的classloader
         gen.setClassLoader(loader);
         return gen.create();
     }
 
     public static class Generator extends AbstractClassGenerator {
+        //类名的一部分
         private static final Source SOURCE = new Source(KeyFactory.class.getName());
+        //默认的自定义类型
         private static final Class[] KNOWN_CUSTOMIZER_TYPES = new Class[]{Customizer.class, FieldTypeCustomizer.class};
 
+        //要实现的接口
         private Class keyInterface;
         // TODO: Make me final when deprecated methods are removed
         private CustomizerRegistry customizers = new CustomizerRegistry(KNOWN_CUSTOMIZER_TYPES);
@@ -212,9 +217,12 @@ abstract public class KeyFactory {
             return customizers.get(klass);
         }
 
+        //设置实现的接口
         public void setInterface(Class keyInterface) {
             this.keyInterface = keyInterface;
         }
+
+
 
         public KeyFactory create() {
             setNamePrefix(keyInterface.getName());

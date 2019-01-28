@@ -117,8 +117,8 @@ implements ClassGenerator
             if (!useCache) {
               return gen.generate(ClassLoaderData.this);
             } else {
-              Object cachedValue = generatedClasses.get(gen);
-              return gen.unwrapCachedValue(cachedValue);
+                Object cachedValue = generatedClasses.get(gen);
+                return gen.unwrapCachedValue(cachedValue);
             }
         }
     }

@@ -14,16 +14,9 @@ import test.People;
  *
  */
 public class LazyLoaderCallback implements LazyLoader {
-
-
-
     public Object loadObject() throws Exception {
         People people = new People();
         people.setLazy(true);
         return people;
     }
-
-
-
-
 }

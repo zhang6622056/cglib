@@ -17,8 +17,6 @@ public class FixValueCallback implements FixedValue {
      * @throws Exception
      */
     public Object loadObject() throws Exception {
-
-
         System.out.println("overwrite the code....");
         return true;
     }

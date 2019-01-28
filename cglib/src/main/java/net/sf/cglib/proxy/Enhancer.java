@@ -64,16 +64,20 @@ public class Enhancer extends AbstractClassGenerator
 {
 
 
-
+    //初始化callback过滤器
     private static final CallbackFilter ALL_ZERO = new CallbackFilter(){
         public int accept(Method method) {
             return 0;
         }
     };
 
+    //用于生成类名，结合父类里面的source属性
     private static final Source SOURCE = new Source(Enhancer.class.getName());
+
+
+    //利用动态代理生成EnhancerKey
     private static final EnhancerKey KEY_FACTORY =
-      (EnhancerKey)KeyFactory.create(EnhancerKey.class, KeyFactory.HASH_ASM_TYPE, null);
+          (EnhancerKey)KeyFactory.create(EnhancerKey.class, KeyFactory.HASH_ASM_TYPE, null);
 
     private static final String BOUND_FIELD = "CGLIB$BOUND";
     private static final String FACTORY_DATA_FIELD = "CGLIB$FACTORY_DATA";
