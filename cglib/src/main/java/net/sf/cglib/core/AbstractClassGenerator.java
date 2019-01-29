@@ -53,6 +53,10 @@ implements ClassGenerator
     private String className;
     private boolean attemptLoad;
 
+
+
+
+
     protected static class ClassLoaderData {
         private final Set<String> reservedClassNames = new HashSet<String>();
 
@@ -86,6 +90,9 @@ implements ClassGenerator
             }
         };
 
+
+
+
         public ClassLoaderData(ClassLoader classLoader) {
             if (classLoader == null) {
                 throw new IllegalArgumentException("classLoader == null is not yet supported");
@@ -117,6 +124,7 @@ implements ClassGenerator
             if (!useCache) {
               return gen.generate(ClassLoaderData.this);
             } else {
+                //enhancerkey net.sf.cglib.proxy.Enhancer$EnhancerKey$$KeyFactoryByCGLIB$$7fb24d72
                 Object cachedValue = generatedClasses.get(gen);
                 return gen.unwrapCachedValue(cachedValue);
             }
@@ -242,6 +250,13 @@ implements ClassGenerator
         return (AbstractClassGenerator)CURRENT.get();
     }
 
+
+    /****
+     *
+     *
+     * 获取classLoader
+     * @return
+     */
     public ClassLoader getClassLoader() {
         ClassLoader t = classLoader;
         if (t == null) {
@@ -274,8 +289,16 @@ implements ClassGenerator
     	return null;
     }
 
+
+    /****
+     *
+     * 创建代理类Class对象
+     * @param key
+     * @return
+     */
     protected Object create(Object key) {
         try {
+            //CACHE为公用缓存
             ClassLoader loader = getClassLoader();
             Map<ClassLoader, ClassLoaderData> cache = CACHE;
             ClassLoaderData data = cache.get(loader);

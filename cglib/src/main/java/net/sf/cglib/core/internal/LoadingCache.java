@@ -2,6 +2,16 @@ package net.sf.cglib.core.internal;
 
 import java.util.concurrent.*;
 
+
+/*****
+ * 缓存对象，被包装在ClassLoaderData中GeneratedClass
+ * get 返回相关对象
+ *
+ * TODO-ZL  Function有什么用 ？
+ * @param <K>
+ * @param <KK>
+ * @param <V>
+ */
 public class LoadingCache<K, KK, V> {
     protected final ConcurrentMap<KK, Object> map;
     protected final Function<K, V> loader;
@@ -34,6 +44,10 @@ public class LoadingCache<K, KK, V> {
         return createEntry(key, cacheKey, v);
     }
 
+
+    /******
+     * 线程竞争，则只有一个线程会竞争成功，没有竞争成功的线程则使用get请求重新加载
+     */
     /**
      * Loads entry to the cache.
      * If entry is missing, put {@link FutureTask} first so other competing thread might wait for the result.
@@ -54,6 +68,8 @@ public class LoadingCache<K, KK, V> {
                     return loader.apply(key);
                 }
             });
+            //如果已经存在，则不会覆盖已有的值，直接返回已存在的值
+            //如果不存在，则向map中添加该键值对，并返回null
             Object prevTask = map.putIfAbsent(cacheKey, task);
             if (prevTask == null) {
                 // creator does the load

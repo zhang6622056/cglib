@@ -159,6 +159,9 @@ abstract public class KeyFactory {
 
     public static KeyFactory create(ClassLoader loader, Class keyInterface, KeyFactoryCustomizer customizer,
                                     List<KeyFactoryCustomizer> next) {
+
+
+        //初始化Generator类对象，设置描述被代理对象
         Generator gen = new Generator();
         gen.setInterface(keyInterface);
 
