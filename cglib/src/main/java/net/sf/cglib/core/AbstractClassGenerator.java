@@ -62,7 +62,12 @@ implements ClassGenerator
 
 
     private String namePrefix;
+    //对应LoadingCache类中的map对应的key，
+    //用于获取缓存对象
     private Object key;
+
+
+
     private boolean useCache = DEFAULT_USE_CACHE;
 
     //
@@ -74,6 +79,10 @@ implements ClassGenerator
     protected static class ClassLoaderData {
         private final Set<String> reservedClassNames = new HashSet<String>();
 
+
+        /***
+         * LoadingCache维护了一个map用来缓存<key,value>,key为AbstractClassGenerator中的key
+         */
         /**
          * {@link AbstractClassGenerator} here holds "cache key" (e.g. {@link net.sf.cglib.proxy.Enhancer}
          * configuration), and the value is the generated class plus some additional values
@@ -99,7 +108,10 @@ implements ClassGenerator
         };
 
 
-
+        /****
+         * 该key用于LoadingCache类中map缓存get方法
+         * 用于获取相关的Object对象
+         */
         private static final Function<AbstractClassGenerator, Object> GET_KEY = new Function<AbstractClassGenerator, Object>() {
             public Object apply(AbstractClassGenerator gen) {
                 return gen.key;
@@ -370,6 +382,7 @@ implements ClassGenerator
 
     /*****
      * 生成代理类的code function
+     * 该类为LoadingCache中维护的loader，用于生成类
      * @param data
      * @return
      */
