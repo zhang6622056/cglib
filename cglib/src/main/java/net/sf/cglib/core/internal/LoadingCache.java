@@ -11,6 +11,10 @@ import java.util.concurrent.*;
  * @param <K>
  * @param <KK>
  * @param <V>
+ *
+ * new LoadingCache<AbstractClassGenerator, Object, Object>(GET_KEY, load);
+ *
+ *
  */
 public class LoadingCache<K, KK, V> {
     protected final ConcurrentMap<KK, Object> map;
@@ -23,6 +27,23 @@ public class LoadingCache<K, KK, V> {
         }
     };
 
+    /****
+     *
+     * @param keyMapper apply GET_KEY的实现，返回一个key
+     *        private static final Function<AbstractClassGenerator, Object> GET_KEY = new Function<AbstractClassGenerator, Object>() {
+     *             public Object apply(AbstractClassGenerator gen) {
+     *                 return gen.key;
+     *             }
+     *         };
+     *
+     * @param loader             Function<AbstractClassGenerator, Object> load =
+     *                     new Function<AbstractClassGenerator, Object>() {
+     *                         public Object apply(AbstractClassGenerator gen) {
+     *                             Class klass = gen.generate(ClassLoaderData.this);
+     *                             return gen.wrapCachedClass(klass);
+     *                         }
+     *                     };
+     */
     public LoadingCache(Function<K, KK> keyMapper, Function<K, V> loader) {
         this.keyMapper = keyMapper;
         this.loader = loader;

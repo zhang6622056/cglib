@@ -276,11 +276,26 @@ public class ReflectUtils {
     public static Object newInstance(Class type) {
         return newInstance(type, Constants.EMPTY_CLASS_ARRAY, null);
     }
-        
+
+
+    /****
+     * 创建class类对象
+     * @param type
+     * @param parameterTypes
+     * @param args
+     * @return
+     */
     public static Object newInstance(Class type, Class[] parameterTypes, Object[] args) {
         return newInstance(getConstructor(type, parameterTypes), args);
     }
-        
+
+
+    /*****
+     * 创建class类对象
+     * @param cstruct
+     * @param args
+     * @return
+     */
     public static Object newInstance(final Constructor cstruct, final Object[] args) {
             
         boolean flag = cstruct.isAccessible();
@@ -303,7 +318,14 @@ public class ReflectUtils {
         }
                 
     }
-        
+
+
+    /*****
+     * 获取class constructor
+     * @param type
+     * @param parameterTypes
+     * @return
+     */
     public static Constructor getConstructor(Class type, Class[] parameterTypes) {
         try {
             Constructor constructor = type.getDeclaredConstructor(parameterTypes);
@@ -313,6 +335,9 @@ public class ReflectUtils {
             throw new CodeGenerationException(e);
         }
     }
+
+
+
 
     public static String[] getNames(Class[] classes)
     {
@@ -406,10 +431,16 @@ public class ReflectUtils {
         throw new NoSuchMethodException(methodName);
             
     }
-        
+
+
+
+    /****
+     * 通过反射机制，将class的methods解析并放入list中
+     * @param type
+     * @param list
+     * @return
+     */
     public static List addAllMethods(final Class type, final List list) {
-            
-            
         if (type == Object.class) {
             list.addAll(OBJECT_METHODS);
         } else

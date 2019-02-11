@@ -77,6 +77,7 @@
         <module>cglib-integration-test</module>
         <module>cglib-jmh</module>
         <module>asm</module>
+        <module>cglib-source-run</module>
     </modules>
 
     <!-- ====================================================================== -->

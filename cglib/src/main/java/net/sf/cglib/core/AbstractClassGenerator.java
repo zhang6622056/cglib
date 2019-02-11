@@ -36,27 +36,41 @@ import java.util.WeakHashMap;
 abstract public class AbstractClassGenerator<T>
 implements ClassGenerator
 {
+    //current对象保存了当前实例的AbstractClassGenerator对象
+    //在methodProxy中有用到，用来获取AbstractClassGenerator相关的信息
+    //用ThreadLocal保存了一个运行时比较重要的类信息。
+    //TODO-ZL 暂未参透在methodproxy中用此类做了什么
     private static final ThreadLocal CURRENT = new ThreadLocal();
 
+    //定义缓存
     private static volatile Map<ClassLoader, ClassLoaderData> CACHE = new WeakHashMap<ClassLoader, ClassLoaderData>();
 
+    //是否默认使用缓存
     private static final boolean DEFAULT_USE_CACHE =
         Boolean.parseBoolean(System.getProperty("cglib.useCache", "true"));
 
+
+    //类生成策略和名字生成策略
     private GeneratorStrategy strategy = DefaultGeneratorStrategy.INSTANCE;
     private NamingPolicy namingPolicy = DefaultNamingPolicy.INSTANCE;
+
+    //TODO-ZL source只维护了一个name，unknown
     private Source source;
+
+    //维护一个加载器用来加载当前的代理类
     private ClassLoader classLoader;
+
+
     private String namePrefix;
     private Object key;
     private boolean useCache = DEFAULT_USE_CACHE;
+
+    //
     private String className;
     private boolean attemptLoad;
 
 
-
-
-
+    //缓存classloader对应的字节码数据，get方法为核心
     protected static class ClassLoaderData {
         private final Set<String> reservedClassNames = new HashSet<String>();
 
@@ -83,6 +97,8 @@ implements ClassGenerator
                 return reservedClassNames.contains(name);
             }
         };
+
+
 
         private static final Function<AbstractClassGenerator, Object> GET_KEY = new Function<AbstractClassGenerator, Object>() {
             public Object apply(AbstractClassGenerator gen) {
@@ -121,15 +137,20 @@ implements ClassGenerator
         }
 
         public Object get(AbstractClassGenerator gen, boolean useCache) {
+            //判定是否使用缓存
             if (!useCache) {
+                //不使用缓存
               return gen.generate(ClassLoaderData.this);
             } else {
+                //使用缓存
                 //enhancerkey net.sf.cglib.proxy.Enhancer$EnhancerKey$$KeyFactoryByCGLIB$$7fb24d72
                 Object cachedValue = generatedClasses.get(gen);
                 return gen.unwrapCachedValue(cachedValue);
             }
         }
     }
+
+
 
     protected T wrapCachedClass(Class klass) {
         return (T) new WeakReference(klass);
@@ -253,7 +274,6 @@ implements ClassGenerator
 
     /****
      *
-     *
      * 获取classLoader
      * @return
      */
@@ -274,6 +294,8 @@ implements ClassGenerator
         return t;
     }
 
+
+    //获取默认的classLoader，实现为被代理类的classloader
     abstract protected ClassLoader getDefaultClassLoader();
 
     /**
@@ -300,8 +322,12 @@ implements ClassGenerator
         try {
             //CACHE为公用缓存
             ClassLoader loader = getClassLoader();
+
+            //尝试获取缓存中的字节码数据
             Map<ClassLoader, ClassLoaderData> cache = CACHE;
             ClassLoaderData data = cache.get(loader);
+
+            //static volatile 只有一个实例，存在线程竞争
             if (data == null) {
                 synchronized (AbstractClassGenerator.class) {
                     cache = CACHE;
@@ -314,7 +340,19 @@ implements ClassGenerator
                     }
                 }
             }
+
+
+//            Object key = KEY_FACTORY.newInstance((superclass != null) ? superclass.getName() : null,
+//                    ReflectUtils.getNames(interfaces),
+//                    filter == ALL_ZERO ? null : new WeakCacheKey<CallbackFilter>(filter),
+//                    callbackTypes,
+//                    useFactory,
+//                    interceptDuringConstruction,
+//                    serialVersionUID);
+            //TODO-ZL EnhancerKey 是做什么用的
             this.key = key;
+
+            //通过ClassLoaderData获取实例，存在判定是否用到缓存的逻辑
             Object obj = data.get(this, getUseCache());
             if (obj instanceof Class) {
                 return firstInstance((Class) obj);
@@ -368,7 +406,6 @@ implements ClassGenerator
 
 
 
-
             ProtectionDomain protectionDomain = getProtectionDomain();
             synchronized (classLoader) { // just in case
                 if (protectionDomain == null) {
@@ -389,6 +426,9 @@ implements ClassGenerator
         }
     }
 
+
+
+    //
     abstract protected Object firstInstance(Class type) throws Exception;
     abstract protected Object nextInstance(Object instance) throws Exception;
 }

@@ -19,6 +19,9 @@ import java.util.*;
 import java.lang.reflect.Array;
 
 /**
+ *
+ * 值的借鉴。对于list的处理
+ *
  * @author Chris Nokleberg
  * @version $Id: CollectionUtils.java,v 1.7 2004/06/24 21:15:21 herbyderby Exp $
  */
@@ -56,6 +59,14 @@ public class CollectionUtils {
         return c;
     }
 
+
+    /*****
+     *
+     * 将集合中的相关操作转换为期望的对象list
+     * @param c
+     * @param t
+     * @return
+     */
     public static List transform(Collection c, Transformer t) {
         List result = new ArrayList(c.size());
         for (Iterator it = c.iterator(); it.hasNext();) {
@@ -63,6 +74,8 @@ public class CollectionUtils {
         }
         return result;
     }
+
+
 
     public static Map getIndexMap(List list) {
         Map indexes = new HashMap();

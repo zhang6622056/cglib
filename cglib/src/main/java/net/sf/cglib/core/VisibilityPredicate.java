@@ -31,6 +31,8 @@ public class VisibilityPredicate implements Predicate {
         pkg = TypeUtils.getPackageName(Type.getType(source));
     }
 
+
+    //验证方法修饰符 private   protected    public等
     public boolean evaluate(Object arg) {
         Member member = (Member)arg;
 		int mod = member.getModifiers();

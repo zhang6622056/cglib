@@ -79,6 +79,8 @@ public class Enhancer extends AbstractClassGenerator
     private static final EnhancerKey KEY_FACTORY =
           (EnhancerKey)KeyFactory.create(EnhancerKey.class, KeyFactory.HASH_ASM_TYPE, null);
 
+
+
     private static final String BOUND_FIELD = "CGLIB$BOUND";
     private static final String FACTORY_DATA_FIELD = "CGLIB$FACTORY_DATA";
     private static final String THREAD_CALLBACKS_FIELD = "CGLIB$THREAD_CALLBACKS";
@@ -486,6 +488,8 @@ public class Enhancer extends AbstractClassGenerator
                 useFactory,
                 interceptDuringConstruction,
                 serialVersionUID);
+
+        //enhancer key
         this.currentKey = key;
         Object result = super.create(key);
         return result;
@@ -547,7 +551,10 @@ public class Enhancer extends AbstractClassGenerator
 
     private static void getMethods(Class superclass, Class[] interfaces, List methods, List interfaceMethods, Set forcePublic)
     {
+        //解析被代理类到methods
         ReflectUtils.addAllMethods(superclass, methods);
+
+        //接口相关方法
         List target = (interfaceMethods != null) ? interfaceMethods : methods;
         if (interfaces != null) {
             for (int i = 0; i < interfaces.length; i++) {
@@ -556,34 +563,42 @@ public class Enhancer extends AbstractClassGenerator
                 }
             }
         }
+
         if (interfaceMethods != null) {
             if (forcePublic != null) {
                 forcePublic.addAll(MethodWrapper.createSet(interfaceMethods));
             }
             methods.addAll(interfaceMethods);
         }
+
+        //过滤，验证是否为静态方法
         CollectionUtils.filter(methods, new RejectModifierPredicate(Constants.ACC_STATIC));
+        //验证方法的修饰域
         CollectionUtils.filter(methods, new VisibilityPredicate(superclass, true));
+        //
         CollectionUtils.filter(methods, new DuplicatesPredicate(methods));
+        //验证final，直接remove
         CollectionUtils.filter(methods, new RejectModifierPredicate(Constants.ACC_FINAL));
     }
 
 
     /*****
-     *
-     *
+     * asm进行class 字节码的编辑
      * 生成代理类的核心方法
      * @param v
      * @throws Exception
      */
     public void generateClass(ClassVisitor v) throws Exception {
         Class sc = (superclass == null) ? Object.class : superclass;
-
+        //验证类修饰符，isFinal相关操作的实现采用二进制的与运算。可以借鉴这种思想
         if (TypeUtils.isFinal(sc.getModifiers()))
             throw new IllegalArgumentException("Cannot subclass final class " + sc.getName());
+        //验证构造函数
         List constructors = new ArrayList(Arrays.asList(sc.getDeclaredConstructors()));
         filterConstructors(sc, constructors);
 
+
+        //提取相关方法
         // Order is very important: must add superclass, then
         // its superclass chain, then each interface and
         // its superinterfaces.
@@ -593,7 +608,8 @@ public class Enhancer extends AbstractClassGenerator
         getMethods(sc, interfaces, actualMethods, interfaceMethods, forcePublic);
 
 
-        //--转换MethodInfo list
+        //--将List<Method>转换为List<MethodInfo>对象
+        //TODO-ZL method签名和MethodInfo转换意图暂未看懂
         List methods = CollectionUtils.transform(actualMethods, new Transformer() {
             public Object transform(Object value) {
                 Method method = (Method)value;
@@ -609,7 +625,8 @@ public class Enhancer extends AbstractClassGenerator
             }
         });
 
-        //-类发射器
+
+        //-Asm ClassVisitor的子类，用来改造类。
         ClassEmitter e = new ClassEmitter(v);
         if (currentData == null) {
         e.begin_class(Constants.V1_2,

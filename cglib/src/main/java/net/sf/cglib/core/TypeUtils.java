@@ -18,6 +18,10 @@ package net.sf.cglib.core;
 import java.util.*;
 import org.objectweb.asm.Type;
 
+
+/****
+ * TODO-LEARN  反射的高效实现，有必要研究
+ */
 public class TypeUtils {
     private static final Map transforms = new HashMap();
     private static final Map rtransforms = new HashMap();
@@ -43,6 +47,8 @@ public class TypeUtils {
         return Type.getType("L" + className.replace('.', '/') + ";");
     }
 
+
+    //判断相关修饰符
     public static boolean isFinal(int access) {
         return (Constants.ACC_FINAL & access) != 0;
     }

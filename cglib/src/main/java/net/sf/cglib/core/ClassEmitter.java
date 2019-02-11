@@ -63,6 +63,16 @@ public class ClassEmitter extends ClassTransformer {
         return classInfo;
     }
 
+
+    /****
+     *
+     * @param version
+     * @param access
+     * @param className
+     * @param superType
+     * @param interfaces
+     * @param source
+     */
     public void begin_class(int version, final int access, String className, final Type superType, final Type[] interfaces, String source) {
         final Type classType = Type.getType("L" + className.replace('.', '/') + ";");
         classInfo = new ClassInfo() {

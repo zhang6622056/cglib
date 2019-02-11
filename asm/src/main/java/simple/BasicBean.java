@@ -2,8 +2,6 @@ package simple;
 
 public class BasicBean {
 
-
-
     private String name;
     private String nickName;
 
