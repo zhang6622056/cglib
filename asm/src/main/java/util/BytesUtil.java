@@ -2,6 +2,10 @@ package util;
 
 import java.io.*;
 
+
+/****
+ * IO设置输出class类
+ */
 public class BytesUtil {
 
 

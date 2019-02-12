@@ -149,6 +149,9 @@ abstract public class KeyFactory {
         return create(keyInterface.getClassLoader(), keyInterface,  customizer);
     }
 
+    //Enhancer类中的EnhancerKey实现类声明所引用的对象
+//    private static final EnhancerKey KEY_FACTORY =
+//            (EnhancerKey)KeyFactory.create(EnhancerKey.class, KeyFactory.HASH_ASM_TYPE, null);
     public static KeyFactory create(Class keyInterface, KeyFactoryCustomizer first, List<KeyFactoryCustomizer> next) {
         return create(keyInterface.getClassLoader(), keyInterface, first, next);
     }
@@ -157,6 +160,9 @@ abstract public class KeyFactory {
         return create(loader, keyInterface, customizer, Collections.<KeyFactoryCustomizer>emptyList());
     }
 
+    //    private static final EnhancerKey KEY_FACTORY =
+//            (EnhancerKey)KeyFactory.create
+//            (EnhancerKey.class.getClassLoader(),EnhancerKey.class, KeyFactory.HASH_ASM_TYPE, null);
     public static KeyFactory create(ClassLoader loader, Class keyInterface, KeyFactoryCustomizer customizer,
                                     List<KeyFactoryCustomizer> next) {
 
@@ -179,26 +185,34 @@ abstract public class KeyFactory {
         return gen.create();
     }
 
+
+    /*****
+     * 生成EnhancerKey的实现类
+     */
     public static class Generator extends AbstractClassGenerator {
         //类名的一部分
         private static final Source SOURCE = new Source(KeyFactory.class.getName());
         //默认的自定义类型
         private static final Class[] KNOWN_CUSTOMIZER_TYPES = new Class[]{Customizer.class, FieldTypeCustomizer.class};
-
-        //要实现的接口
+        //要实现的接口,由此引出默认的classloader
         private Class keyInterface;
         // TODO: Make me final when deprecated methods are removed
         private CustomizerRegistry customizers = new CustomizerRegistry(KNOWN_CUSTOMIZER_TYPES);
         private int constant;
         private int multiplier;
 
+
+
         public Generator() {
             super(SOURCE);
         }
 
+        //获取加载的classLoader，本例中为获取接口相关的classloader
         protected ClassLoader getDefaultClassLoader() {
             return keyInterface.getClassLoader();
         }
+
+
 
         protected ProtectionDomain getProtectionDomain() {
         	return ReflectUtils.getProtectionDomain(keyInterface);
@@ -240,14 +254,21 @@ abstract public class KeyFactory {
             this.multiplier = multiplier;
         }
 
+
+
+        //生成一个新的实例，type为Class对象，利用反射生成一个新对象
         protected Object firstInstance(Class type) {
             return ReflectUtils.newInstance(type);
         }
 
+
+        //Generator的下一个实例则直接返回当前参数
         protected Object nextInstance(Object instance) {
             return instance;
         }
 
+
+        //ASM修改字节码生成一个具体的实现类，具体的实现
         public void generateClass(ClassVisitor v) {
             ClassEmitter ce = new ClassEmitter(v);
             

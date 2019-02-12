@@ -13,7 +13,13 @@ import java.lang.reflect.Method;
  */
 public class test{
 
-
+    /*****
+     *
+     *
+     * AEnh
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 //       Thread t1 = new Thread(new Runnable() {
 //            public void run() {
@@ -58,7 +64,7 @@ public class test{
 //        }
 
 
-
+        //尝试使用Enhancer代理类
         People people = new People();
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(people.getClass());      //设置被代理类

@@ -4,6 +4,12 @@ import simple.BasicBean;
 
 import java.lang.ref.WeakReference;
 
+
+/*****
+ * WeakReference 弱引用测试
+ *
+ *
+ */
 public class WeakMainTest {
 
 

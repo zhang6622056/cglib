@@ -39,43 +39,59 @@ implements ClassGenerator
     //current对象保存了当前实例的AbstractClassGenerator对象
     //在methodProxy中有用到，用来获取AbstractClassGenerator相关的信息
     //用ThreadLocal保存了一个运行时比较重要的类信息。
-    //TODO-ZL 暂未参透在methodproxy中用此类做了什么
+
+
+    //CURRENT保存了当前线程的AbstractClassGenerator，用于调用其方法生成类对象
+    //            AbstractClassGenerator fromEnhancer = AbstractClassGenerator.getCurrent();
+    //            if (fromEnhancer != null) {
+    //                namingPolicy = fromEnhancer.getNamingPolicy();
+    //                strategy = fromEnhancer.getStrategy();
+    //                attemptLoad = fromEnhancer.getAttemptLoad();
+    //            }
     private static final ThreadLocal CURRENT = new ThreadLocal();
 
-    //定义缓存
+
+    //定义缓存，当key被移除的时候，其映射的值也会被丢失，节省内存开销
+    //https://www.cnblogs.com/skywang12345/p/3311092.html
     private static volatile Map<ClassLoader, ClassLoaderData> CACHE = new WeakHashMap<ClassLoader, ClassLoaderData>();
 
     //是否默认使用缓存
     private static final boolean DEFAULT_USE_CACHE =
         Boolean.parseBoolean(System.getProperty("cglib.useCache", "true"));
+    private boolean useCache = DEFAULT_USE_CACHE;
+
 
 
     //类生成策略和名字生成策略
     private GeneratorStrategy strategy = DefaultGeneratorStrategy.INSTANCE;
     private NamingPolicy namingPolicy = DefaultNamingPolicy.INSTANCE;
 
-    //TODO-ZL source只维护了一个name，unknown
+    //source只维护了一个name，但尤其重要，该name是生成代理类必须的因素
+    //作为构造方法的入参，用来拼装类名称
     private Source source;
+    private String namePrefix;
+
+
+
+
 
     //维护一个加载器用来加载当前的代理类
     private ClassLoader classLoader;
 
-
-    private String namePrefix;
     //对应LoadingCache类中的map对应的key，
     //用于获取缓存对象
     private Object key;
 
 
-
-    private boolean useCache = DEFAULT_USE_CACHE;
-
-    //
+    //用于维护最终生成的className
     private String className;
+
+    //TODO-ZL 是否尝试加载，这在MethodProxy中有用到。需要结合ASM理解其含义
     private boolean attemptLoad;
 
 
-    //缓存classloader对应的字节码数据，get方法为核心
+    //保存classLoader对应的classloaderdata数据
+    //ClassLoaderData与LoadingCache相配合，维护了一个缓存机制，用于获取相应代理class对象
     protected static class ClassLoaderData {
         private final Set<String> reservedClassNames = new HashSet<String>();
 
@@ -163,15 +179,18 @@ implements ClassGenerator
     }
 
 
-
+    //对缓存class对象进行包装缓存或接触缓存
+    //这里更多指的是弱引用
     protected T wrapCachedClass(Class klass) {
         return (T) new WeakReference(klass);
     }
-
     protected Object unwrapCachedValue(T cached) {
         return ((WeakReference) cached).get();
     }
 
+
+
+    //维护了一个内部类，该name是代理类name组装的一部分
     protected static class Source {
         String name;
         public Source(String name) {
@@ -179,14 +198,16 @@ implements ClassGenerator
         }
     }
 
+
     protected AbstractClassGenerator(Source source) {
         this.source = source;
     }
 
+
+
     protected void setNamePrefix(String namePrefix) {
         this.namePrefix = namePrefix;
     }
-
     final protected String getClassName() {
         return className;
     }
@@ -198,20 +219,6 @@ implements ClassGenerator
     private String generateClassName(Predicate nameTestPredicate) {
         return namingPolicy.getClassName(namePrefix, source.name, key, nameTestPredicate);
     }
-
-    /**
-     * Set the <code>ClassLoader</code> in which the class will be generated.
-     * Concrete subclasses of <code>AbstractClassGenerator</code> (such as <code>Enhancer</code>)
-     * will try to choose an appropriate default if this is unset.
-     * <p>
-     * Classes are cached per-<code>ClassLoader</code> using a <code>WeakHashMap</code>, to allow
-     * the generated classes to be removed when the associated loader is garbage collected.
-     * @param classLoader the loader to generate the new class with, or null to use the default
-     */
-    public void setClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
-
     /**
      * Override the default naming policy.
      * @see DefaultNamingPolicy
@@ -230,6 +237,44 @@ implements ClassGenerator
         return namingPolicy;
     }
 
+
+    /**
+     * Set the <code>ClassLoader</code> in which the class will be generated.
+     * Concrete subclasses of <code>AbstractClassGenerator</code> (such as <code>Enhancer</code>)
+     * will try to choose an appropriate default if this is unset.
+     * <p>
+     * Classes are cached per-<code>ClassLoader</code> using a <code>WeakHashMap</code>, to allow
+     * the generated classes to be removed when the associated loader is garbage collected.
+     * @param classLoader the loader to generate the new class with, or null to use the default
+     */
+    //设置代理类的类加载器
+    public void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
+    /****
+     *
+     * 获取classLoader
+     * @return
+     */
+    public ClassLoader getClassLoader() {
+        ClassLoader t = classLoader;
+        if (t == null) {
+            t = getDefaultClassLoader();
+        }
+        if (t == null) {
+            t = getClass().getClassLoader();
+        }
+        if (t == null) {
+            t = Thread.currentThread().getContextClassLoader();
+        }
+        if (t == null) {
+            throw new IllegalStateException("Cannot determine classloader");
+        }
+        return t;
+    }
+
+
     /**
      * Whether use and update the static cache of generated classes
      * for a class with the same properties. Default is <code>true</code>.
@@ -244,6 +289,9 @@ implements ClassGenerator
     public boolean getUseCache() {
         return useCache;
     }
+
+
+
 
     /**
      * If set, CGLIB will attempt to load classes from the specified
@@ -284,30 +332,10 @@ implements ClassGenerator
     }
 
 
-    /****
-     *
-     * 获取classLoader
-     * @return
-     */
-    public ClassLoader getClassLoader() {
-        ClassLoader t = classLoader;
-        if (t == null) {
-            t = getDefaultClassLoader();
-        }
-        if (t == null) {
-            t = getClass().getClassLoader();
-        }
-        if (t == null) {
-            t = Thread.currentThread().getContextClassLoader();
-        }
-        if (t == null) {
-            throw new IllegalStateException("Cannot determine classloader");
-        }
-        return t;
-    }
 
 
-    //获取默认的classLoader，实现为被代理类的classloader
+
+    //提出机制，获取默认的类加载器
     abstract protected ClassLoader getDefaultClassLoader();
 
     /**
@@ -324,9 +352,14 @@ implements ClassGenerator
     }
 
 
-    /****
-     *
-     * 创建代理类Class对象
+
+
+
+
+    /*****
+     * 创建一个被代理对象，
+     * 该类被所有AbstractClassGenerator的子类所Generator所调用，
+     * 用来生成一个Class类生成器
      * @param key
      * @return
      */
@@ -361,7 +394,6 @@ implements ClassGenerator
 //                    useFactory,
 //                    interceptDuringConstruction,
 //                    serialVersionUID);
-            //TODO-ZL EnhancerKey 是做什么用的
             this.key = key;
 
             //通过ClassLoaderData获取实例，存在判定是否用到缓存的逻辑
@@ -380,9 +412,14 @@ implements ClassGenerator
     }
 
 
+
+
+
+    
     /*****
      * 生成代理类的code function
      * 该类为LoadingCache中维护的loader，用于生成类
+     * 用来创建字节码class，这里调用了基类实现的生成器
      * @param data
      * @return
      */
@@ -410,6 +447,8 @@ implements ClassGenerator
                     // ignore
                 }
             }
+
+            //调用基类实现的ASM增加字节码
             byte[] b = strategy.generate(this);
             String className = ClassNameReader.getClassName(new ClassReader(b));
 
@@ -441,7 +480,9 @@ implements ClassGenerator
 
 
 
-    //
+    //抽象两个方法，用于返回相应的对象实例，注意两个方法的参数
+    //firstInstance Class参数
+    //nextInstance  instance参数
     abstract protected Object firstInstance(Class type) throws Exception;
     abstract protected Object nextInstance(Object instance) throws Exception;
 }

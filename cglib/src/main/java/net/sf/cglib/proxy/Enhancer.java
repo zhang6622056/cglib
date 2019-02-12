@@ -144,7 +144,11 @@ public class Enhancer extends AbstractClassGenerator
     private static final Signature BIND_CALLBACKS =
       TypeUtils.parseSignature("void CGLIB$BIND_CALLBACKS(Object)");
 
+
+
     private EnhancerFactoryData currentData;
+
+    //记录EnhancerKey.newInstance生成的key，用于LoadingCache中的map key
     private Object currentKey;
 
     /** Internal interface, only public due to ClassLoader issues. */
@@ -506,6 +510,7 @@ public class Enhancer extends AbstractClassGenerator
         return super.generate(data);
     }
 
+    //获取默认的classLoader
     protected ClassLoader getDefaultClassLoader() {
         if (superclass != null) {
             return superclass.getClassLoader();
@@ -515,6 +520,7 @@ public class Enhancer extends AbstractClassGenerator
             return null;
         }
     }
+
 
     protected ProtectionDomain getProtectionDomain() {
         if (superclass != null) {

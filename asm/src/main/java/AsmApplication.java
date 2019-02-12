@@ -6,6 +6,13 @@ import java.io.IOException;
 public class AsmApplication {
 
 
+    /****
+     *
+     *
+     * 简单的asm测试
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
         ClassReader classReader = new ClassReader("simple.BasicBean");
         ClassPrinter classPrinter = new ClassPrinter(458752);
