@@ -16,12 +16,10 @@
 package net.sf.cglib.core;
 
 import net.sf.cglib.transform.ClassTransformer;
-
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,11 +65,11 @@ public class ClassEmitter extends ClassTransformer {
     /****
      *
      * @param version
-     * @param access
-     * @param className
-     * @param superType
-     * @param interfaces
-     * @param source
+     * @param access    modifys修饰符，一般传public
+     * @param className proxy classname
+     * @param superType 继承的父类
+     * @param interfaces  proxy implments interfaces
+     * @param source   TODO-ZL Constants.SOURCE_FILE  unknows
      */
     public void begin_class(int version, final int access, String className, final Type superType, final Type[] interfaces, String source) {
         final Type classType = Type.getType("L" + className.replace('.', '/') + ";");

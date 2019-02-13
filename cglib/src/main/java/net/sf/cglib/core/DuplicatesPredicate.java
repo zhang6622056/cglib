@@ -29,6 +29,12 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+
+/****
+ *
+ * 重复性验证
+ *
+ */
 public class DuplicatesPredicate implements Predicate {
   private final Set unique;
   private final Set rejected;

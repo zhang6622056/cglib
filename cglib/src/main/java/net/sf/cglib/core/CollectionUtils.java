@@ -49,6 +49,9 @@ public class CollectionUtils {
         }
     }
 
+
+    //接受一个集合，用一个方法来判定，不符合标准的remove掉
+    //可以看到入参和返回都是比较抽象的上层概念。以此来达到高可用
     public static Collection filter(Collection c, Predicate p) {
         Iterator it = c.iterator();
         while (it.hasNext()) {

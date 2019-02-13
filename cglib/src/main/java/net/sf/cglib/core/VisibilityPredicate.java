@@ -18,6 +18,7 @@ package net.sf.cglib.core;
 import java.lang.reflect.*;
 import org.objectweb.asm.Type;
 
+
 public class VisibilityPredicate implements Predicate {
     private boolean protectedOk;
     private String pkg;

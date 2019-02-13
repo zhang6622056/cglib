@@ -63,7 +63,6 @@ import org.objectweb.asm.Label;
 public class Enhancer extends AbstractClassGenerator
 {
 
-
     //初始化callback过滤器
     private static final CallbackFilter ALL_ZERO = new CallbackFilter(){
         public int accept(Method method) {
@@ -89,7 +88,7 @@ public class Enhancer extends AbstractClassGenerator
     private static final String SET_STATIC_CALLBACKS_NAME = "CGLIB$SET_STATIC_CALLBACKS";
     private static final String CONSTRUCTED_FIELD = "CGLIB$CONSTRUCTED";
     /**
-     * {@link net.sf.cglib.core.AbstractClassGenerator.ClassLoaderData#generatedClasses} requires to keep cache key
+     * {@link net.sf.cglib.core.AbstractClassGenerator.ClassLoaderData} requires to keep cache key
      * in a good shape (the keys should be up and running if the proxy class is alive), and one of the cache keys is
      * {@link CallbackFilter}. That is why the generated class contains static field that keeps strong reference to
      * the {@link #filter}.
@@ -152,6 +151,7 @@ public class Enhancer extends AbstractClassGenerator
     private Object currentKey;
 
     /** Internal interface, only public due to ClassLoader issues. */
+    //
     public interface EnhancerKey {
         public Object newInstance(String type,
                                   String[] interfaces,
@@ -350,6 +350,27 @@ public class Enhancer extends AbstractClassGenerator
         return (Class)createHelper();
     }
 
+
+    //生成代理类的核心方法
+    private Object createHelper() {
+        //-验证Interceptor的callbacktype，初始化callbacktype，
+        preValidate();
+
+        //-初始化一个key
+        Object key = KEY_FACTORY.newInstance((superclass != null) ? superclass.getName() : null,
+                ReflectUtils.getNames(interfaces),
+                filter == ALL_ZERO ? null : new WeakCacheKey<CallbackFilter>(filter),
+                callbackTypes,
+                useFactory,
+                interceptDuringConstruction,
+                serialVersionUID);
+
+        //enhancer key
+        this.currentKey = key;
+        Object result = super.create(key);
+        return result;
+    }
+
     /**
      * Insert a static serialVersionUID field into the generated class.
      * @param sUID the field value, or null to avoid generating field.
@@ -358,6 +379,8 @@ public class Enhancer extends AbstractClassGenerator
         serialVersionUID = sUID;
     }
 
+
+    //创建代理之前的验证
     private void preValidate() {
         if (callbackTypes == null) {
             callbackTypes = CallbackInfo.determineTypes(callbacks, false);
@@ -370,6 +393,8 @@ public class Enhancer extends AbstractClassGenerator
             filter = ALL_ZERO;
         }
     }
+
+
 
     private void validate() {
         if (classOnly ^ (callbacks == null)) {
@@ -480,25 +505,13 @@ public class Enhancer extends AbstractClassGenerator
         }
     }
 
-    private Object createHelper() {
-        //-验证Interceptor的callbacktype，初始化callbacktype，
-        preValidate();
 
-        //-初始化一个key
-        Object key = KEY_FACTORY.newInstance((superclass != null) ? superclass.getName() : null,
-                ReflectUtils.getNames(interfaces),
-                filter == ALL_ZERO ? null : new WeakCacheKey<CallbackFilter>(filter),
-                callbackTypes,
-                useFactory,
-                interceptDuringConstruction,
-                serialVersionUID);
-
-        //enhancer key
-        this.currentKey = key;
-        Object result = super.create(key);
-        return result;
-    }
-
+    /*****
+     * 重写父类方法，用于ClassLoaderData.get()
+     * gen.generate()
+     * @param data
+     * @return
+     */
     @Override
     protected Class generate(ClassLoaderData data) {
         validate();
@@ -557,7 +570,8 @@ public class Enhancer extends AbstractClassGenerator
 
     private static void getMethods(Class superclass, Class[] interfaces, List methods, List interfaceMethods, Set forcePublic)
     {
-        //解析被代理类到methods
+        //解析被代理类的所有方法到methods的list中
+        //顺序以此为superclass superclass extends supersuperclass    superclass impl interface
         ReflectUtils.addAllMethods(superclass, methods);
 
         //接口相关方法
@@ -577,13 +591,13 @@ public class Enhancer extends AbstractClassGenerator
             methods.addAll(interfaceMethods);
         }
 
-        //过滤，验证是否为静态方法
+        //过滤静态方法
         CollectionUtils.filter(methods, new RejectModifierPredicate(Constants.ACC_STATIC));
-        //验证方法的修饰域
+        //过滤私有方法
         CollectionUtils.filter(methods, new VisibilityPredicate(superclass, true));
-        //
+        //TODO-zl 重复方法过滤，具体尚未深入
         CollectionUtils.filter(methods, new DuplicatesPredicate(methods));
-        //验证final，直接remove
+        //过滤final方法
         CollectionUtils.filter(methods, new RejectModifierPredicate(Constants.ACC_FINAL));
     }
 
@@ -651,6 +665,8 @@ public class Enhancer extends AbstractClassGenerator
                     new Type[]{FACTORY},
                     Constants.SOURCE_FILE);
         }
+
+        
         List constructorInfo = CollectionUtils.transform(constructors, MethodInfoTransformer.getInstance());
 
         e.declare_field(Constants.ACC_PRIVATE, BOUND_FIELD, Type.BOOLEAN_TYPE, null);
@@ -704,6 +720,7 @@ public class Enhancer extends AbstractClassGenerator
      * @param constructors the list of all declared constructors from the superclass
      * @throws IllegalArgumentException if there are no non-private constructors
      */
+    //sc, sc.getDeclaredConstructors()
     protected void filterConstructors(Class sc, List constructors) {
         CollectionUtils.filter(constructors, new VisibilityPredicate(sc, true));
         if (constructors.size() == 0)

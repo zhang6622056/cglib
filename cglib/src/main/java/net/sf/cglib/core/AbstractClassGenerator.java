@@ -70,9 +70,8 @@ implements ClassGenerator
     //作为构造方法的入参，用来拼装类名称
     private Source source;
     private String namePrefix;
-
-
-
+    //用于维护最终生成的className
+    private String className;
 
 
     //维护一个加载器用来加载当前的代理类
@@ -82,9 +81,6 @@ implements ClassGenerator
     //用于获取缓存对象
     private Object key;
 
-
-    //用于维护最终生成的className
-    private String className;
 
     //TODO-ZL 是否尝试加载，这在MethodProxy中有用到。需要结合ASM理解其含义
     private boolean attemptLoad;

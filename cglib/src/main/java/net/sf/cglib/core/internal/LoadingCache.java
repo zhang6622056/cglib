@@ -14,16 +14,10 @@ import java.util.concurrent.*;
  *
  *
  * 真正的缓存对象的提取
- *
  * Function  抽象一个行为，用于封装一些逻辑，将特定的K传入，返回特定的value
- *
- *
- *
- *
  */
 public class LoadingCache<K, KK, V> {
     protected final ConcurrentMap<KK, Object> map;
-
 
 
     //封装了对AbstractClassGenerator中generator()运行时方法的调用
@@ -80,10 +74,7 @@ public class LoadingCache<K, KK, V> {
 
     /******
      * 线程竞争，则只有一个线程会竞争成功，没有竞争成功的线程则使用get请求重新加载
-     *
      * 当多个线程竞争同一个futuretask对象时，只有一个get方法在运行。
-     *
-     *
      */
     /**
      * Loads entry to the cache.

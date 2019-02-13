@@ -508,6 +508,7 @@ public class ReflectUtils {
         return 0;
     }
 
+
     public static MethodInfo getMethodInfo(final Member member, final int modifiers) {
         final Signature sig = getSignature(member);
         return new MethodInfo() {

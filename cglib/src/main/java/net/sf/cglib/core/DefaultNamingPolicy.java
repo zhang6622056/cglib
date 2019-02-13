@@ -34,7 +34,9 @@ public class DefaultNamingPolicy implements NamingPolicy {
      * This allows to test collisions of {@code key.hashCode()}.
      */
     private final static boolean STRESS_HASH_CODE = Boolean.getBoolean("net.sf.cglib.test.stressHashCodes");
-    
+
+
+    //命名生成策略
     public String getClassName(String prefix, String source, Object key, Predicate names) {
         if (prefix == null) {
             prefix = "net.sf.cglib.empty.Object";

@@ -18,6 +18,13 @@ package net.sf.cglib.core;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Type;
 
+
+/****
+ * 对类描述的封装
+ *
+ *
+ *
+ */
 abstract public class ClassInfo {
 
     protected ClassInfo() {
