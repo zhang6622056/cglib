@@ -71,7 +71,7 @@ public class FirstTimeGenerate extends AbstractClassGenerator {
             TypeUtils.parseType("net.sf.cglib.proxy.Callback");
     private static final Type CALLBACK_ARRAY =
             Type.getType(Callback[].class);
-
+    private static final String CALLBACK_FILTER_FIELD = "CGLIB$CALLBACK_FILTER";
 
 
 
@@ -131,7 +131,7 @@ public class FirstTimeGenerate extends AbstractClassGenerator {
 
 
 
-    //TODO-ZL
+    //proxy添加默认构造
     private void emitDefaultConstructor(ClassEmitter ce) {
         Constructor<Object> declaredConstructor;
         try {
@@ -150,7 +150,16 @@ public class FirstTimeGenerate extends AbstractClassGenerator {
     }
 
 
-    //对号入座，反射提取class所有的method，放到对应的methods与interfaces位置
+
+    private static String getCallbackField(int index) {
+        return "CGLIB$CALLBACK_" + index;
+    }
+
+
+
+
+
+    //反射提取class所有的method，放到对应的methods与interfaces位置
     private void getMethods(Class sc, Class[] interfaces,List methods, List interfaceMethods, Set forcePublic){
         //包括父类与接口的方法全部一次性提取
         ReflectUtils.addAllMethods(sc,methods);
@@ -271,15 +280,15 @@ public class FirstTimeGenerate extends AbstractClassGenerator {
         }
 
 
-//        for (int i = 0; i < callbackTypes.length; i++) {
-////            e.declare_field(Constants.ACC_PRIVATE, getCallbackField(i), callbackTypes[i], null);
-////        }
+        for (int i = 0; i < callbackTypes.length; i++) {
+            e.declare_field(Constants.ACC_PRIVATE, getCallbackField(i), callbackTypes[i], null);
+        }
         // This is declared private to avoid "public field" pollution
-//        e.declare_field(Constants.ACC_PRIVATE | Constants.ACC_STATIC, CALLBACK_FILTER_FIELD, OBJECT_TYPE, null);
-//
+        e.declare_field(Constants.ACC_PRIVATE | Constants.ACC_STATIC, CALLBACK_FILTER_FIELD, OBJECT_TYPE, null);
 
 
-        emitDefaultConstructor(e);
+
+
 
 //        if (currentData == null) {
 //            emitMethods(e, methods, actualMethods);

@@ -649,7 +649,7 @@ public class Enhancer extends AbstractClassGenerator
         //-Asm ClassVisitor的子类，用来改造类。
         ClassEmitter e = new ClassEmitter(v);
         if (currentData == null) {
-        e.begin_class(Constants.V1_2,
+        e.begin_class(Constants.V1_6,
                       Constants.ACC_PUBLIC,
                       getClassName(),
                       Type.getType(sc),
@@ -658,7 +658,7 @@ public class Enhancer extends AbstractClassGenerator
                        TypeUtils.getTypes(interfaces)),
                       Constants.SOURCE_FILE);
         } else {
-            e.begin_class(Constants.V1_2,
+            e.begin_class(Constants.V1_6,
                     Constants.ACC_PUBLIC,
                     getClassName(),
                     null,
@@ -666,7 +666,7 @@ public class Enhancer extends AbstractClassGenerator
                     Constants.SOURCE_FILE);
         }
 
-        
+
         List constructorInfo = CollectionUtils.transform(constructors, MethodInfoTransformer.getInstance());
 
         e.declare_field(Constants.ACC_PRIVATE, BOUND_FIELD, Type.BOOLEAN_TYPE, null);
@@ -1311,7 +1311,7 @@ public class Enhancer extends AbstractClassGenerator
         e.return_value();
         e.end_method();
     }
-    
+
     private void emitCurrentCallback(CodeEmitter e, int index) {
         e.load_this();
         e.getfield(getCallbackField(index));

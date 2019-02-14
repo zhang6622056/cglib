@@ -10,8 +10,6 @@ import java.lang.reflect.Method;
 
 
 public class InvocationHandlerCallback implements InvocationHandler {
-
-
     /*****
      * invocationHandler的invoke方法传入的method和proxy都是代理本身对象
      * 切忌重复调用，会循环调用
@@ -23,11 +21,10 @@ public class InvocationHandlerCallback implements InvocationHandler {
      */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         System.out.println("invocationHandlerCallback Before....");
-        //method.invoke(proxy.getClass().getSuperclass().newInstance(),args);
+        method.invoke(proxy.getClass().getSuperclass().newInstance(),args);
         //会无限循环
-        method.invoke(proxy,args);
+        //method.invoke(proxy,args);
         System.out.println("invocationHandlerCallback after....");
         return null;
     }
-
 }
