@@ -7,6 +7,10 @@ import proxybean.CallbackBean;
 
 import java.lang.reflect.Method;
 
+
+/****
+ * 将生成的class文件转换成java文件
+ */
 public class CallbackBean$$EnhancerByCGLIB$$f08d58b4 extends CallbackBean implements Factory {
 
     //存储当前线程的callbacks
