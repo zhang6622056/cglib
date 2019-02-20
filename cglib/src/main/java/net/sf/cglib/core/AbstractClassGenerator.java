@@ -354,17 +354,16 @@ implements ClassGenerator
 
     /*****
      * 创建一个被代理对象，
-     * 该类被所有AbstractClassGenerator的子类所Generator所调用，
-     * 用来生成一个Class类生成器
+     * 该类被所有AbstractClassGenerator的子类Generator所调用，
      * @param key
      * @return
      */
     protected Object create(Object key) {
         try {
-            //CACHE为公用缓存
+            //一级缓存loader作为缓存key
             ClassLoader loader = getClassLoader();
 
-            //尝试获取缓存中的字节码数据
+            //获取对应的一级缓存Value
             Map<ClassLoader, ClassLoaderData> cache = CACHE;
             ClassLoaderData data = cache.get(loader);
 
@@ -376,13 +375,12 @@ implements ClassGenerator
                     if (data == null) {
                         Map<ClassLoader, ClassLoaderData> newCache = new WeakHashMap<ClassLoader, ClassLoaderData>(cache);
                         data = new ClassLoaderData(loader);
+
                         newCache.put(loader, data);
                         CACHE = newCache;
                     }
                 }
             }
-
-
 //            Object key = KEY_FACTORY.newInstance((superclass != null) ? superclass.getName() : null,
 //                    ReflectUtils.getNames(interfaces),
 //                    filter == ALL_ZERO ? null : new WeakCacheKey<CallbackFilter>(filter),

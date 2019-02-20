@@ -51,7 +51,7 @@ public class TestBeanCopier extends TestCase {
         copier.copy(bean1, bean2, new Converter() {
             public Object convert(Object value, Class target, Object context) {
                 if (target.equals(Integer.TYPE)) {
-                    return new Integer(((Number)value).intValue() + 1);
+                        return new Integer(((Number)value).intValue() + 1);
                 }
                 return value;
             }

@@ -167,6 +167,8 @@ public class Enhancer extends AbstractClassGenerator
     private Callback[] callbacks;
     private Type[] callbackTypes;
     private boolean validateCallbackTypes;
+
+    //是否生成实例，默认生成，也就是classOnly为false
     private boolean classOnly;
     private Class superclass;
     private Class[] argumentTypes;
@@ -737,6 +739,7 @@ public class Enhancer extends AbstractClassGenerator
      * @return newly created proxy instance
      * @throws Exception if something goes wrong
      */
+    //提出概念，获取第一个proxy实例，如果map中获取的对象为Class对象
     protected Object firstInstance(Class type) throws Exception {
         if (classOnly) {
             return type;
@@ -745,6 +748,9 @@ public class Enhancer extends AbstractClassGenerator
         }
     }
 
+
+
+    //提出概念获取非第一个proxy实例，如果map获取的对象不是Class对象
     protected Object nextInstance(Object instance) {
         EnhancerFactoryData data = (EnhancerFactoryData) instance;
 
@@ -761,6 +767,13 @@ public class Enhancer extends AbstractClassGenerator
         return data.newInstance(argumentTypes, arguments, callbacks);
     }
 
+
+    /****
+     * LoadingCache中存储的value，重写这个方法将更新Loadingcache中Map存储的value
+     *
+     * @param klass
+     * @return
+     */
     @Override
     protected Object wrapCachedClass(Class klass) {
         Class[] argumentTypes = this.argumentTypes;
@@ -785,6 +798,15 @@ public class Enhancer extends AbstractClassGenerator
         return new WeakReference<EnhancerFactoryData>(factoryData);
     }
 
+
+    /*****
+     *
+     * 对应LoadingCache中map get出来的封装逻辑
+     *
+     *
+     * @param cached
+     * @return
+     */
     @Override
     protected Object unwrapCachedValue(Object cached) {
         if (currentKey instanceof EnhancerKey) {
@@ -848,10 +870,15 @@ public class Enhancer extends AbstractClassGenerator
         }
     }
 
+
+
     private static void setThreadCallbacks(Class type, Callback[] callbacks) {
         setCallbacksHelper(type, callbacks, SET_THREAD_CALLBACKS_NAME);
     }
 
+
+
+    //调用生成的字节码setcallbacks 传入callbacks数组
     private static void setCallbacksHelper(Class type, Callback[] callbacks, String methodName) {
         // TODO: optimize
         try {
@@ -879,6 +906,8 @@ public class Enhancer extends AbstractClassGenerator
      * @param type class to instantiate
      * @return newly created instance
      */
+    //实例化一个代理对象，返回代理实例
+    //需要注意的是该实例的调用将设置代理类的CGLIB$THREAD_CALLBACKS
     private Object createUsingReflection(Class type) {
         setThreadCallbacks(type, callbacks);
         try{

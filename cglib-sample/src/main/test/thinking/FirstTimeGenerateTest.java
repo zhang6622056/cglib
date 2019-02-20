@@ -1,9 +1,9 @@
 package thinking;
 
-import generateprocess.FirstTimeGenerate;
 import net.sf.cglib.core.CollectionUtils;
 import net.sf.cglib.core.Predicate;
 import net.sf.cglib.core.VisibilityPredicate;
+import net.sf.cglib.proxy.FirstTimeGenerate;
 import org.junit.Test;
 import proxybean.People;
 
@@ -21,6 +21,12 @@ public class FirstTimeGenerateTest{
         firstTimeGenerate.setSuperClass(People.class);
         firstTimeGenerate.create();
     }
+
+
+
+
+
+
 
 
 

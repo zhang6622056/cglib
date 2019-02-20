@@ -30,6 +30,8 @@ abstract public class BeanCopier
 {
     private static final BeanCopierKey KEY_FACTORY =
       (BeanCopierKey)KeyFactory.create(BeanCopierKey.class);
+
+
     private static final Type CONVERTER =
       TypeUtils.parseType("net.sf.cglib.core.Converter");
     private static final Type BEAN_COPIER =
@@ -38,10 +40,15 @@ abstract public class BeanCopier
       new Signature("copy", Type.VOID_TYPE, new Type[]{ Constants.TYPE_OBJECT, Constants.TYPE_OBJECT, CONVERTER });
     private static final Signature CONVERT =
       TypeUtils.parseSignature("Object convert(Object, Class, Object)");
-    
+
+
+
     interface BeanCopierKey {
         public Object newInstance(String source, String target, boolean useConverter);
     }
+
+
+
 
     public static BeanCopier create(Class source, Class target, boolean useConverter) {
         Generator gen = new Generator();
@@ -51,7 +58,23 @@ abstract public class BeanCopier
         return gen.create();
     }
 
+    //抽象出来copy方法，代理类继承实现
     abstract public void copy(Object from, Object to, Converter converter);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public static class Generator extends AbstractClassGenerator {
         private static final Source SOURCE = new Source(BeanCopier.class.getName());
@@ -64,17 +87,17 @@ abstract public class BeanCopier
         }
 
         public void setSource(Class source) {
-            if(!Modifier.isPublic(source.getModifiers())){ 
-               setNamePrefix(source.getName());
+            if(!Modifier.isPublic(source.getModifiers())){
+                setNamePrefix(source.getName());
             }
             this.source = source;
         }
-        
+
         public void setTarget(Class target) {
-            if(!Modifier.isPublic(target.getModifiers())){ 
-               setNamePrefix(target.getName());
+            if(!Modifier.isPublic(target.getModifiers())){
+                setNamePrefix(target.getName());
             }
-          
+
             this.target = target;
         }
 
@@ -87,7 +110,7 @@ abstract public class BeanCopier
         }
 
         protected ProtectionDomain getProtectionDomain() {
-        	return ReflectUtils.getProtectionDomain(source);
+            return ReflectUtils.getProtectionDomain(source);
         }
 
         public BeanCopier create() {
@@ -95,16 +118,19 @@ abstract public class BeanCopier
             return (BeanCopier)super.create(key);
         }
 
+
+
+        //生成代理类实现copy方法
         public void generateClass(ClassVisitor v) {
             Type sourceType = Type.getType(source);
             Type targetType = Type.getType(target);
             ClassEmitter ce = new ClassEmitter(v);
             ce.begin_class(Constants.V1_2,
-                           Constants.ACC_PUBLIC,
-                           getClassName(),
-                           BEAN_COPIER,
-                           null,
-                           Constants.SOURCE_FILE);
+                    Constants.ACC_PUBLIC,
+                    getClassName(),
+                    BEAN_COPIER,
+                    null,
+                    Constants.SOURCE_FILE);
 
             EmitUtils.null_constructor(ce);
             CodeEmitter e = ce.begin_method(Constants.ACC_PUBLIC, COPY, null);
@@ -121,7 +147,7 @@ abstract public class BeanCopier
                 e.load_arg(1);
                 e.checkcast(targetType);
                 e.store_local(targetLocal);
-                e.load_arg(0);                
+                e.load_arg(0);
                 e.checkcast(sourceType);
                 e.store_local(sourceLocal);
             } else {
@@ -165,6 +191,7 @@ abstract public class BeanCopier
             return setter.getPropertyType().isAssignableFrom(getter.getPropertyType());
         }
 
+
         protected Object firstInstance(Class type) {
             return ReflectUtils.newInstance(type);
         }
@@ -173,4 +200,7 @@ abstract public class BeanCopier
             return instance;
         }
     }
+
+
+
 }

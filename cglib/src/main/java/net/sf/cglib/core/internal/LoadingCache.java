@@ -20,7 +20,7 @@ public class LoadingCache<K, KK, V> {
     protected final ConcurrentMap<KK, Object> map;
 
 
-    //封装了对AbstractClassGenerator中generator()运行时方法的调用
+    //该Function的apply方法将决定task的get的返回。也就间接的决定了map内存入的值
     protected final Function<K, V> loader;
 
     //封装了返回相应cachekey的逻辑
@@ -34,14 +34,14 @@ public class LoadingCache<K, KK, V> {
 
     /****
      *
-     * @param keyMapper apply GET_KEY的实现，返回一个key
+     * @param keyMapper 用于转换key apply GET_KEY的实现，返回一个key
      *        private static final Function<AbstractClassGenerator, Object> GET_KEY = new Function<AbstractClassGenerator, Object>() {
      *             public Object apply(AbstractClassGenerator gen) {
      *                 return gen.key;
      *             }
      *         };
      *
-     * @param loader             Function<AbstractClassGenerator, Object> load =
+     * @param loader 用于转换存储的value     Function<AbstractClassGenerator, Object> load =
      *                     new Function<AbstractClassGenerator, Object>() {
      *                         public Object apply(AbstractClassGenerator gen) {
      *                             Class klass = gen.generate(ClassLoaderData.this);
@@ -109,9 +109,6 @@ public class LoadingCache<K, KK, V> {
                 return (V) prevTask;
             }
         }
-
-
-
 
         V result;
         try {

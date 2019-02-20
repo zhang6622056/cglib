@@ -18,13 +18,19 @@ public class CallbackTest {
         enhancer.setCallbacks(initCallBacks());
         enhancer.setCallbackFilter(initCallbackFilter());
         CallbackBean callbackBean = (CallbackBean) enhancer.create();
+        CallbackBean callbackBean1 = (CallbackBean) enhancer.create();
+        System.out.println(callbackBean);
+        System.out.println(callbackBean1);
 
-        callbackBean.methodForNoop();
-        callbackBean.methodForInterceptor();
-        callbackBean.methodForLazy();
-        callbackBean.methodForDispatcher();
-        callbackBean.methodForInvocationHandler();
-        callbackBean.methodForFixValue();
+
+
+//
+//        callbackBean.methodForNoop();
+//        callbackBean.methodForInterceptor();
+//        callbackBean.methodForLazy();
+//        callbackBean.methodForDispatcher();
+//        callbackBean.methodForInvocationHandler();
+//        callbackBean.methodForFixValue();
     }
 
 
