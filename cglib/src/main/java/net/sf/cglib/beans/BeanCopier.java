@@ -152,6 +152,9 @@ abstract public class BeanCopier
                         e.dup2();
                         e.invoke(read);
                         e.invoke(write);
+                    }else{
+                        System.out.println("转换错误:getter:"+getter.getName());
+                        System.out.println("转换错误:setter:"+setter.getName());
                     }
                 }
             }
